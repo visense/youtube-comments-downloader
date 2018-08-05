@@ -135,8 +135,8 @@
       'video'
     ]),
     methods: {
-      updateVideoId (event) {
-        this.$store.dispatch('reset')
+      async updateVideoId (event) {
+        this.$store.commit('reset')
 
         const checkPattern = /(?:youtube(?:-nocookie)?\.com\/(?:[^/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)?([a-zA-Z0-9_-]{11})/
         const match = this.input.match(checkPattern)
@@ -156,11 +156,13 @@
           window.history.pushState({}, '', '/')
         }
 
-        this.$store.dispatch('getVideo')
+        await this.$store.dispatch('getVideo')
       },
-      onSubmit () {
-        this.$store.dispatch('reset')
-        this.$store.dispatch('getCommentThreads')
+      async onSubmit () {
+        this.$store.commit('loading', true)
+        this.$store.commit('reset')
+        await this.$store.dispatch('getCommentThreads')
+        this.$store.commit('loading', false)
       }
     },
     mounted () {
