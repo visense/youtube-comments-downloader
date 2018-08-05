@@ -1,7 +1,7 @@
 {
   "name": "youtube-comments-downloader",
-  "version": "1.3.0",
-  "description": "A Vue.js project",
+  "version": "1.4.0",
+  "description": "A tool for Youtubers to help them working with thousands of comments",
   "author": "Bartek Igielski <igloczek@gmail.com>",
   "private": true,
   "scripts": {
