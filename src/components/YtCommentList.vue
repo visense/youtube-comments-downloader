@@ -40,7 +40,7 @@
       >
         <v-divider class="my-3"/>
         <p>
-          For videos with more than {{ breakpoint }} comments pagination is enabled, to prevent browsers craches and keep render times in reasonable limits.
+          For videos with more than {{ breakpoint }} comments pagination is enabled, to prevent browsers crashes and keep render times in reasonable limits.
         </p>
 
         <v-pagination
