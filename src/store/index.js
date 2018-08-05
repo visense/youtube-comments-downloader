@@ -18,6 +18,7 @@ export default new Vuex.Store({
     video: false,
     comments: {},
     commentList: [],
+    commentsCount: 0,
     search: ''
   },
   mutations,

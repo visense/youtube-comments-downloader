@@ -6,6 +6,7 @@ export default {
   reset (state) {
     state.comments = {}
     state.commentList = []
+    state.commentsCount = 0
   },
   search (state, value) {
     state.search = value
@@ -16,9 +17,13 @@ export default {
   video (state, video) {
     state.video = video
   },
+  loading (state, loading) {
+    state.loading = loading
+  },
   comment (state, comment) {
     const data = comment.snippet.topLevelComment
 
+    state.commentsCount++
     state.commentList.push(data.id)
 
     Vue.set(state.comments, data.id, {
@@ -37,6 +42,7 @@ export default {
     const data = payload.reply.snippet
     const id = payload.reply.id.replace(data.parentId + '.', '')
 
+    state.commentsCount++
     state.comments[data.parentId].replyList.push(id)
 
     Vue.set(state.comments, id, {

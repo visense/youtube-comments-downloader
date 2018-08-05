@@ -1,10 +1,7 @@
 import request from '../api'
 
 export default {
-  reset (context) {
-    context.commit('reset')
-  },
-  getVideo (context) {
+  async getVideo (context) {
     const url = new URL(context.state.api.url + 'videos')
     const params = {
       key: context.state.api.key,
@@ -12,12 +9,10 @@ export default {
       part: 'snippet,statistics'
     }
 
-    return request(url, params)
-      .then(response => {
-        context.commit('video', response.items[0])
-      })
+    const response = await request(url, params)
+    context.commit('video', response.items[0])
   },
-  getCommentThreads (context, pageToken) {
+  async getCommentThreads (context, pageToken) {
     const url = new URL(context.state.api.url + 'commentThreads')
     const params = {
       key: context.state.api.key,
@@ -30,36 +25,35 @@ export default {
       params.pageToken = pageToken
     }
 
-    context.state.loading = true
+    try {
+      const response = await request(url, params)
 
-    return request(url, params)
-      .then(response => {
-        if (response.nextPageToken) {
-          context.dispatch('getCommentThreads', response.nextPageToken)
-        }
-
-        response.items.forEach(comment => {
-          context.commit('comment', comment)
-
-          if (comment.snippet.totalReplyCount > 0) {
-            context.dispatch('getComments', comment.snippet.topLevelComment.id)
-          }
-        })
-
-        if (!response.nextPageToken) {
-          context.state.loading = false
-        }
+      response.items.forEach(comment => {
+        context.commit('comment', comment)
       })
-      .catch(error => {
-        context.state.loading = false
-        context.state.error = {
-          videoId: params.videoId,
-          pageToken: pageToken || false,
-          ...error
-        }
-      })
+
+      const promises = []
+
+      promises.push(
+        ...response.items
+          .filter(comment => comment.snippet.totalReplyCount > 0)
+          .map(comment => context.dispatch('getComments', comment.snippet.topLevelComment.id))
+      )
+
+      if (response.nextPageToken) {
+        promises.push(context.dispatch('getCommentThreads', response.nextPageToken))
+      }
+
+      await Promise.all(promises)
+    } catch (error) {
+      context.state.error = {
+        videoId: params.videoId,
+        pageToken: pageToken || false,
+        ...error
+      }
+    }
   },
-  getComments (context, commentId, pageToken) {
+  async getComments (context, commentId, pageToken) {
     const url = new URL(context.state.api.url + 'comments')
     const params = {
       key: context.state.api.key,
@@ -72,24 +66,23 @@ export default {
       params.pageToken = pageToken
     }
 
-    return request(url, params)
-      .then(response => {
-        if (response.nextPageToken) {
-          context.dispatch('getComments', response.nextPageToken)
-        }
+    try {
+      const response = await request(url, params)
 
-        response.items.forEach(reply => {
-          context.commit('commentReply', { commentId, reply })
-        })
+      response.items.forEach(reply => {
+        context.commit('commentReply', { commentId, reply })
       })
-      .catch(error => {
-        context.state.loading = false
-        context.state.error = {
-          videoId: params.videoId,
-          commentId,
-          pageToken: pageToken || false,
-          ...error
-        }
-      })
+
+      if (response.nextPageToken) {
+        await context.dispatch('getComments', response.nextPageToken)
+      }
+    } catch (error) {
+      context.state.error = {
+        videoId: params.videoId,
+        commentId,
+        pageToken: pageToken || false,
+        ...error
+      }
+    }
   }
 }

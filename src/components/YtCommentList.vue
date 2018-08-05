@@ -2,12 +2,13 @@
   <div class="mt-4">
     <template v-if="loading">
       <div class="text-xs-center">
-        {{ commentsCount }} / {{ video.statistics.commentCount }}
+        {{ commentsCount }} comments fetched...
       </div>
 
       <v-progress-linear
-        v-model="progress"
+        :indeterminate="true"
         color="red"
+        style="will-change: auto"
       ></v-progress-linear>
     </template>
 
@@ -44,7 +45,6 @@
         </ul>
       </v-card>
     </template>
-
   </div>
 </template>
 
@@ -69,22 +69,8 @@
       VTextField,
       YtComment
     },
-    data () {
-      return {
-        comments: []
-      }
-    },
     computed: {
-      commentsCount () {
-        return Object.keys(this.$store.state.comments).length
-      },
-      progress () {
-        if (this.video) {
-          return this.commentsCount / this.video.statistics.commentCount * 100
-        }
-        return 0
-      },
-      fetchedComments () {
+      comments () {
         if (this.search) {
           return this.$store.getters.commentsWithText(this.search)
         }
@@ -99,31 +85,10 @@
         }
       },
       ...mapState([
+        'commentsCount',
         'loading',
         'video'
       ])
-    },
-    methods: {
-      renderComments () {
-        let comments = this.fetchedComments
-        let count = comments.length
-
-        while (count > 0) {
-          const qty = count >= 100 ? 100 : count
-          count -= qty
-          this.comments.push(...comments.splice(0, qty))
-        }
-      }
-    },
-    watch: {
-      loading (loading) {
-        if (!loading) {
-          this.renderComments()
-        }
-      },
-      video () {
-        this.comments = []
-      }
     }
   }
 </script>
