@@ -8,7 +8,7 @@
       <v-progress-linear
         v-model="progress"
         color="red"
-      ></v-progress-linear>
+      />
     </template>
 
     <template v-if="commentsCount && !loading">
@@ -17,9 +17,9 @@
         raised
       >
         <v-text-field
+          v-model="search"
           label="Search in comments"
           type="search"
-          v-model="search"
           color="red"
           clearable
         />
@@ -35,8 +35,8 @@
       </v-card>
 
       <div
-        class="text-xs-center"
         v-if="commentsCount > breakpoint"
+        class="text-xs-center"
       >
         <v-divider class="my-3"/>
         <p>
@@ -55,16 +55,16 @@
       <v-card flat>
         <ul class="comment-list pa-4">
           <yt-comment
-            :comment="comment"
             v-for="comment in comments"
-            v-bind:key="comment.id"
-          ></yt-comment>
+            :comment="comment"
+            :key="comment.id"
+          />
         </ul>
       </v-card>
 
       <div
-        class="text-xs-center"
         v-if="commentsCount > breakpoint"
+        class="text-xs-center"
       >
         <v-divider class="my-3"/>
         <v-pagination
@@ -72,7 +72,7 @@
           :length="length"
           :total-visible="7"
           color="red"
-        ></v-pagination>
+        />
       </div>
     </template>
   </div>
@@ -80,21 +80,19 @@
 
 <script>
   import { mapState } from 'vuex'
-
   import * as VCard from 'vuetify/es5/components/VCard'
-  import * as VGrid from 'vuetify/es5/components/VGrid'
-
-  import VDivider from 'vuetify/es5/components/VDivider'
-  import VPagination from 'vuetify/es5/components/VPagination'
-  import VProgressLinear from 'vuetify/es5/components/VProgressLinear'
-  import VTextField from 'vuetify/es5/components/VTextField'
+  import {
+    VDivider,
+    VPagination,
+    VProgressLinear,
+    VTextField
+  } from 'vuetify'
 
   import YtComment from '@/components/YtComment'
 
   export default {
     components: {
       ...VCard,
-      ...VGrid,
       VDivider,
       VPagination,
       VProgressLinear,

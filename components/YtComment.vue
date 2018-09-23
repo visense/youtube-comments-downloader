@@ -1,14 +1,14 @@
 <template>
   <li class="comment">
     <v-avatar
-      class="comment__avatar grey"
       :size="avatarSize"
+      class="comment__avatar grey"
     >
       <img
-        class="lazyload"
         :data-src="avatar"
         :width="avatarSize"
         :height="avatarSize"
+        class="lazyload"
       >
     </v-avatar>
 
@@ -19,14 +19,14 @@
         </span>
 
         <span class="comment__time">
-          <timeago :since="comment.date"></timeago>
+          <timeago :since="comment.date"/>
         </span>
       </div>
 
       <div
         class="comment__text"
         v-html="text"
-      ></div>
+      />
 
       <div class="comment__footer">
         <span class="comment__reply">
@@ -34,8 +34,8 @@
         </span>
 
         <span
-          class="comment__count"
           v-if="comment.likes > 0"
+          class="comment__count"
         >
           {{ comment.likes }}
         </span>
@@ -58,15 +58,15 @@
       </div>
 
       <div
-        class="comment__child"
         v-if="comment.totalReplyCount > 0"
+        class="comment__child"
       >
         <yt-comment
           v-for="reply in replies"
-          v-bind:key="reply.id"
+          :key="reply.id"
           :comment="reply"
-          isChild="true"
-        ></yt-comment>
+          :is-child="true"
+        />
       </div>
 
     </div>
@@ -74,20 +74,28 @@
 </template>
 
 <script>
-  import * as VGrid from 'vuetify/es5/components/VGrid'
-
-  import VAvatar from 'vuetify/es5/components/VAvatar'
-  import VBtn from 'vuetify/es5/components/VBtn'
-  import VIcon from 'vuetify/es5/components/VIcon'
+  import {
+    VAvatar,
+    VBtn,
+    VIcon
+  } from 'vuetify'
 
   export default {
-    name: 'yt-comment',
-    props: ['comment', 'isChild'],
+    name: 'YtComment',
     components: {
-      ...VGrid,
       VAvatar,
       VBtn,
       VIcon
+    },
+    props: {
+      comment: {
+        type: Object,
+        required: true
+      },
+      isChild: {
+        type: Boolean,
+        default: false
+      }
     },
     computed: {
       avatar () {
