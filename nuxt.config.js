@@ -1,5 +1,4 @@
 module.exports = {
-  mode: 'universal',
   head: {
     title: 'Youtube Comments Downloader',
     meta: [
