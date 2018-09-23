@@ -1,5 +1,5 @@
 <template>
-  <v-form v-on:submit.prevent="onSubmit">
+  <v-form @submit.prevent="onSubmit">
     <v-layout
       row
       wrap
@@ -11,13 +11,13 @@
         <v-card flat>
           <v-card-text>
             <v-text-field
-              label="Youtube video URL or ID"
-              type="text"
               id="video-id"
               v-model="input"
-              @input="updateVideoId"
+              type="text"
+              label="Youtube video URL or ID"
               color="red"
-            ></v-text-field>
+              @input="updateVideoId"
+            />
 
             <p class="grey--text">
               Copy and paste YouTube URL or video ID to fetch all comments.
@@ -32,10 +32,10 @@
         d-flex
       >
         <v-card flat>
-          <v-card-media
+          <v-img
             :src="video.snippet.thumbnails.standard.url"
-            height="150px"
-          ></v-card-media>
+            height="200px"
+          />
 
           <v-card-title class="px-0 py-2">
             <h3 class="title mb-0">
@@ -54,11 +54,11 @@
 
           <v-card-actions class="px-0">
             <v-btn
+              :loading="loading"
+              :disabled="loading"
               type="submit"
               color="red white--text mx-0"
               block
-              :loading="loading"
-              :disabled="loading"
             >
               Fetch comments
               <span slot="loader">
@@ -72,8 +72,8 @@
     </v-layout>
 
     <div
-      class="form__error"
       v-if="error"
+      class="form__error"
     >
       <img src="https://media.giphy.com/media/13NRvWtOiMXawM/giphy.gif">
 
@@ -90,7 +90,7 @@
         </p>
         <p>
           Message:
-          <strong v-html="item.message"></strong>
+          <strong v-html="item.message" />
         </p>
         <p>
           Reason:
@@ -109,10 +109,13 @@
   import * as VGrid from 'vuetify/es5/components/VGrid'
   import * as VCard from 'vuetify/es5/components/VCard'
 
-  import VBtn from 'vuetify/es5/components/VBtn'
-  import VForm from 'vuetify/es5/components/VForm'
-  import VProgressCircular from 'vuetify/es5/components/VProgressCircular'
-  import VTextField from 'vuetify/es5/components/VTextField'
+  import {
+    VBtn,
+    VForm,
+    VImg,
+    VProgressCircular,
+    VTextField
+  } from 'vuetify'
 
   export default {
     components: {
@@ -120,13 +123,13 @@
       ...VGrid,
       VBtn,
       VForm,
+      VImg,
       VProgressCircular,
       VTextField
     },
     data () {
       return {
-        input: '',
-        urlString: window.location.href
+        input: ''
       }
     },
     computed: mapState([
@@ -134,6 +137,17 @@
       'loading',
       'video'
     ]),
+    mounted () {
+      if (process.browser) {
+        const href = window.location.href
+        const url = new URL(href)
+
+        if (url.searchParams.get('v')) {
+          this.input = url.searchParams.get('v')
+          this.updateVideoId()
+        }
+      }
+    },
     methods: {
       async updateVideoId (event) {
         this.$store.commit('reset')
@@ -163,14 +177,6 @@
         this.$store.commit('reset')
         await this.$store.dispatch('getCommentThreads')
         this.$store.commit('loading', false)
-      }
-    },
-    mounted () {
-      const url = new URL(this.urlString)
-
-      if (url.searchParams.get('v')) {
-        this.input = url.searchParams.get('v')
-        this.updateVideoId()
       }
     }
   }
